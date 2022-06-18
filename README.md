@@ -1,2 +1,2 @@
-#Digital Commerce
-The services within the Digital Commerce package will encompass order management, payment management, and cart management. 
+# Digital Commerce
+The services within the Digital Commerce package will encompass orders, payments, carts and users. 
