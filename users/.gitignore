@@ -1,2 +1,5 @@
 *.yaml
 *.idea
+*.env
+*.env.docker.*
+postgres-data

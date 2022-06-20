@@ -10,5 +10,5 @@ type User struct {
 	LastName    string    `json:"last_name" gorm:"not null"`
 	Email       string    `json:"email" gorm:"not null"`
 	DateOfBirth string    `json:"date_of_birth" gorm:"not null"`
-	Address     []Address `json:"address" gorm:"embedded"`
+	Address     []Address `json:"address"`
 }
