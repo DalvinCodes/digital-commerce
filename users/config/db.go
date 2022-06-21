@@ -3,9 +3,11 @@ package config
 import (
 	"fmt"
 	"github.com/DalvinCodes/digital-commerce/users/model"
+	zap2 "go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"moul.io/zapgorm2"
 )
 
 type UsersDB struct {
@@ -24,7 +26,13 @@ func NewUsersDatabase(configFile *Configurations) *gorm.DB {
 		configFile.Postgres.Port,
 		configFile.Postgres.Name)
 
-	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
+	zap := zapgorm2.New(zap2.L())
+	zap.SetAsDefault()
+
+	db, err := gorm.Open(postgres.Open(url), &gorm.Config{
+		Logger: zap,
+	})
+
 	if err != nil {
 		log.Fatalln(err)
 	}
