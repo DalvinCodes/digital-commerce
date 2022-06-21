@@ -1,2 +1,7 @@
 *.yaml
 *.idea
+*.env
+*.env.docker.*
+postgres-data
+*.json
+repo/mock_user_test_data.txt
