@@ -27,7 +27,7 @@ func (s *UserTestSuite) SetupTest() {
 	var db *sql.DB
 	var err error
 
-	db, s.Mock, err = sqlmock.New()
+	db, s.Mock, err = sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	if err != nil {
 		s.T().Logf("error setting up mock database suite: %v", err)
 		s.FailNow(err.Error())
