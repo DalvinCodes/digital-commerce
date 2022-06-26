@@ -30,7 +30,8 @@ func NewUsersDatabase(configFile *Configurations) *gorm.DB {
 	zap.SetAsDefault()
 
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{
-		Logger: zap,
+		Logger:                 zap,
+		SkipDefaultTransaction: true,
 	})
 
 	if err != nil {
@@ -61,5 +62,6 @@ func pingDB(db *gorm.DB) error {
 	if err != nil {
 		return err
 	}
+	log.Print("Ping Successful")
 	return sqlDB.Ping()
 }

@@ -10,14 +10,14 @@ type UserRepository interface {
 	Create(ctx context.Context, user *model.User) error
 }
 
-type userRepo struct {
-	db *gorm.DB
+type UserRepo struct {
+	Db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *userRepo {
-	return &userRepo{db: db}
+func NewUserRepository(db *gorm.DB) *UserRepo {
+	return &UserRepo{Db: db}
 }
 
-func (r *userRepo) Create(ctx context.Context, user *model.User) error {
-	return r.db.Create(&user).Error
+func (r *UserRepo) Create(ctx context.Context, user *model.User) error {
+	return r.Db.Debug().Create(&user).Error
 }

@@ -4,4 +4,4 @@
 *.env.docker.*
 postgres-data
 *.json
-repo/mock_user_test_data.txt
+repo/user_test/mock_user_test_data.txt
