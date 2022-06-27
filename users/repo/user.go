@@ -9,11 +9,16 @@ import (
 type UserRepository interface {
 	Create(ctx context.Context, user *model.User) error
 	ListAll(ctx context.Context) ([]*model.User, error)
+	FindByID(ctx context.Context, id string) (*model.User, error)
 }
 
 type UserRepo struct {
 	Db *gorm.DB
 }
+
+const (
+	idIs = `id = ?`
+)
 
 func NewUserRepository(db *gorm.DB) *UserRepo {
 	return &UserRepo{Db: db}
@@ -31,4 +36,17 @@ func (r *UserRepo) ListAll(ctx context.Context) ([]*model.User, error) {
 	}
 
 	return users, nil
+}
+
+func (r *UserRepo) FindByID(ctx context.Context, id string) (*model.User, error) {
+	var user model.User
+
+	if err := r.Db.WithContext(ctx).
+		Where(idIs, id).
+		Find(&user).Error;
+		err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
