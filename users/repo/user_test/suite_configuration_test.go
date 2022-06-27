@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"database/sql"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/DalvinCodes/digital-commerce/users/model"
@@ -14,10 +15,11 @@ import (
 
 type UserTestSuite struct {
 	suite.Suite
-	Repo repo.UserRepo
-	Mock sqlmock.Sqlmock
-	DB   *sql.DB
-	User model.User
+	Repo     repo.UserRepo
+	Mock     sqlmock.Sqlmock
+	DB       *sql.DB
+	User     model.User
+	UserList []*model.User
 }
 
 func (s *UserTestSuite) SetupTest() {
@@ -27,7 +29,7 @@ func (s *UserTestSuite) SetupTest() {
 	var db *sql.DB
 	var err error
 
-	db, s.Mock, err = sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	db, s.Mock, err = sqlmock.New()
 	if err != nil {
 		s.T().Logf("error setting up mock database suite: %v", err)
 		s.FailNow(err.Error())
@@ -67,6 +69,18 @@ func (s *UserTestSuite) SeedUser() *model.User {
 	user.DateOfBirth = gofakeit.Date().Format("01/02/2006")
 
 	return &user
+}
+
+func (s *UserTestSuite) SeedUserList() {
+	for i := 0; i < 10; i++ {
+		user := s.SeedUser()
+
+		if err := s.Repo.Create(context.Background(), user); err != nil {
+			s.T().Logf("error creating a seed user for list: %v", err)
+		}
+
+		s.UserList = append(s.UserList, user)
+	}
 }
 
 func TestRunUserTestSuite(t *testing.T) {
