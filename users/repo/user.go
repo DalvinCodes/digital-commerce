@@ -25,13 +25,14 @@ func NewUserRepository(db *gorm.DB) *UserRepo {
 }
 
 func (r *UserRepo) Create(ctx context.Context, user *model.User) error {
-	return r.Db.Debug().Create(&user).Error
+
+	return r.Db.Debug().WithContext(ctx).Create(&user).Error
 }
 
 func (r *UserRepo) ListAll(ctx context.Context) ([]*model.User, error) {
 	var users []*model.User
 
-	if err := r.Db.WithContext(ctx).Find(&users).Error; err != nil {
+	if err := r.Db.Debug().WithContext(ctx).Find(&users).Error; err != nil {
 		return nil, err
 	}
 
@@ -41,10 +42,9 @@ func (r *UserRepo) ListAll(ctx context.Context) ([]*model.User, error) {
 func (r *UserRepo) FindByID(ctx context.Context, id string) (*model.User, error) {
 	var user model.User
 
-	if err := r.Db.WithContext(ctx).
+	if err := r.Db.Debug().WithContext(ctx).
 		Where(idIs, id).
-		Find(&user).Error;
-		err != nil {
+		Find(&user).Error; err != nil {
 		return nil, err
 	}
 

@@ -5,9 +5,12 @@ import (
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/DalvinCodes/digital-commerce/users/repo"
-	"github.com/gofiber/fiber/v2/utils"
 	"gorm.io/gorm"
 	"regexp"
+)
+
+const (
+	mockID = "83297b32-a8f8-4c62-a1a6-8be574899cba"
 )
 
 func (s *UserTestSuite) TestUser_NewRepository() {
@@ -24,8 +27,6 @@ func (s *UserTestSuite) TestUser_Create() {
 	//Given
 	user := s.SeedUser()
 	const userQuery = `INSERT INTO "users" ("id","username","first_name","last_name","email","dob") VALUES ($1,$2,$3,$4,$5,$6)`
-
-	defer s.DB.Close()
 
 	//When
 	s.Mock.ExpectExec(regexp.QuoteMeta(userQuery)).
@@ -51,7 +52,6 @@ func (s *UserTestSuite) TestUser_ListAll() {
 	s.Mock.ExpectQuery(regexp.QuoteMeta(userQuery)).
 		WillReturnRows(sqlmock.NewRows(nil))
 
-	defer s.DB.Close()
 	actualUsers, err := s.Repo.ListAll(context.Background())
 
 	//Then
@@ -61,7 +61,7 @@ func (s *UserTestSuite) TestUser_ListAll() {
 	s.Require().Nil(errExpectations)
 }
 
-func (s *UserTestSuite) TestUser_ListAllShouldReturnError() {
+func (s *UserTestSuite) TestUser_ListAll_ReturnsError() {
 	//Given
 	const userQuery = `SELECT * FROM "users"`
 
@@ -81,14 +81,29 @@ func (s *UserTestSuite) TestUser_ListAllShouldReturnError() {
 func (s *UserTestSuite) TestUser_FindByID() {
 	//Given
 	const userQuery = `SELECT * FROM "users" WHERE id = $1`
-	id := utils.UUIDv4()
 
 	//When
 	s.Mock.ExpectQuery(regexp.QuoteMeta(userQuery)).
 		WithArgs(sqlmock.AnyArg()).
 		WillReturnRows(sqlmock.NewRows(nil))
 
-	user, err := s.Repo.FindByID(context.Background(), id)
-	s.Require().NoError(err, "error while creating user")
+	//Then
+	user, err := s.Repo.FindByID(context.Background(), mockID)
+	s.Require().NoError(err, "unexpected error while creating user")
+	s.Require().Empty(user)
+}
+
+func (s *UserTestSuite) TestUser_FindByID_ReturnsError() {
+	//Given
+	const userQuery = `SELECT * FROM "users" WHERE id = $1`
+
+	//When
+	s.Mock.ExpectQuery(regexp.QuoteMeta(userQuery)).
+		WithArgs(sqlmock.AnyArg()).
+		WillReturnError(errors.New("unable to query db for user"))
+	user, err := s.Repo.FindByID(context.Background(), mockID)
+
+	//Then
+	s.Require().Error(err, "error was expected while retrieving user")
 	s.Require().Empty(user)
 }
