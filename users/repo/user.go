@@ -10,6 +10,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user *model.User) error
 	ListAll(ctx context.Context) ([]*model.User, error)
 	FindByID(ctx context.Context, id string) (*model.User, error)
+	Update(ctx context.Context, user *model.User) error
 }
 
 type UserRepo struct {
@@ -49,4 +50,8 @@ func (r *UserRepo) FindByID(ctx context.Context, id string) (*model.User, error)
 	}
 
 	return &user, nil
+}
+
+func (r *UserRepo) Update(ctx context.Context, user *model.User) error {
+	return r.Db.Debug().WithContext(ctx).Model(&user).Updates(&user).Error
 }

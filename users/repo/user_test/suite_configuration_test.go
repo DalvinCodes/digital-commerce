@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"context"
 	"database/sql"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/DalvinCodes/digital-commerce/users/model"
@@ -22,7 +21,7 @@ type UserTestSuite struct {
 	UserList []*model.User
 }
 
-func (s *UserTestSuite) SetupTest() {
+func (s *UserTestSuite) SetupSuite() {
 	s.T().Log("Setting Up User Test Suite.")
 
 	//Setting up Mock DB and Mock Test Expectation Suite
@@ -74,11 +73,6 @@ func (s *UserTestSuite) SeedUser() *model.User {
 func (s *UserTestSuite) SeedUserList() {
 	for i := 0; i < 10; i++ {
 		user := s.SeedUser()
-
-		if err := s.Repo.Create(context.Background(), user); err != nil {
-			s.T().Logf("error creating a seed user for list: %v", err)
-		}
-
 		s.UserList = append(s.UserList, user)
 	}
 }

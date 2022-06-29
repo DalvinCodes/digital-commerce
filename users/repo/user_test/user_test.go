@@ -9,10 +9,6 @@ import (
 	"regexp"
 )
 
-const (
-	mockID = "83297b32-a8f8-4c62-a1a6-8be574899cba"
-)
-
 func (s *UserTestSuite) TestUser_NewRepository() {
 
 	var gormDB *gorm.DB
@@ -31,7 +27,8 @@ func (s *UserTestSuite) TestUser_Create() {
 	//When
 	s.Mock.ExpectExec(regexp.QuoteMeta(userQuery)).
 		WithArgs(
-			sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+			user.ID, user.Username, user.FirstName,
+			user.LastName, user.Email, user.DateOfBirth).
 		WillReturnResult(
 			sqlmock.NewResult(1, 1))
 
@@ -81,29 +78,57 @@ func (s *UserTestSuite) TestUser_ListAll_ReturnsError() {
 func (s *UserTestSuite) TestUser_FindByID() {
 	//Given
 	const userQuery = `SELECT * FROM "users" WHERE id = $1`
+	obj := s.SeedUser()
 
 	//When
 	s.Mock.ExpectQuery(regexp.QuoteMeta(userQuery)).
-		WithArgs(sqlmock.AnyArg()).
+		WithArgs(obj.ID).
 		WillReturnRows(sqlmock.NewRows(nil))
 
 	//Then
-	user, err := s.Repo.FindByID(context.Background(), mockID)
+	user, err := s.Repo.FindByID(context.Background(), obj.ID)
 	s.Require().NoError(err, "unexpected error while creating user")
 	s.Require().Empty(user)
+
+	errExpectations := s.Mock.ExpectationsWereMet()
+	s.Require().Nil(errExpectations)
 }
 
 func (s *UserTestSuite) TestUser_FindByID_ReturnsError() {
 	//Given
 	const userQuery = `SELECT * FROM "users" WHERE id = $1`
+	obj := s.SeedUser()
 
 	//When
 	s.Mock.ExpectQuery(regexp.QuoteMeta(userQuery)).
-		WithArgs(sqlmock.AnyArg()).
+		WithArgs(obj.ID).
 		WillReturnError(errors.New("unable to query db for user"))
-	user, err := s.Repo.FindByID(context.Background(), mockID)
+
+	user, err := s.Repo.FindByID(context.Background(), obj.ID)
 
 	//Then
 	s.Require().Error(err, "error was expected while retrieving user")
 	s.Require().Empty(user)
+
+	errExpectations := s.Mock.ExpectationsWereMet()
+	s.Require().Nil(errExpectations)
+}
+
+func (s *UserTestSuite) TestUser_Update() {
+	//Given
+	const userQuery = `UPDATE "users" SET "username"=$1,"first_name"=$2,"last_name"=$3,"email"=$4,"dob"=$5 WHERE "id" = $6`
+	user := s.SeedUser()
+
+	//When
+	s.Mock.ExpectExec(regexp.QuoteMeta(userQuery)).
+		WithArgs(
+			user.Username, user.FirstName, user.LastName,
+			user.Email, user.DateOfBirth, user.ID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := s.Repo.Update(context.Background(), user)
+	s.Require().Nil(err)
+
+	errExpectations := s.Mock.ExpectationsWereMet()
+	s.Require().Nil(errExpectations)
 }
