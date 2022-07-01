@@ -7,6 +7,7 @@ import (
 	"github.com/DalvinCodes/digital-commerce/users/repo"
 	"gorm.io/gorm"
 	"regexp"
+	"time"
 )
 
 func (s *UserTestSuite) TestUser_NewRepository() {
@@ -22,13 +23,15 @@ func (s *UserTestSuite) TestUser_NewRepository() {
 func (s *UserTestSuite) TestUser_Create() {
 	//Given
 	user := s.SeedUser()
-	const userQuery = `INSERT INTO "users" ("id","username","first_name","last_name","email","dob") VALUES ($1,$2,$3,$4,$5,$6)`
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
+	const userQuery = `INSERT INTO "users" ("id","username","first_name","last_name","email","dob","created_at","updated_at","is_deleted") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`
 
 	//When
 	s.Mock.ExpectExec(regexp.QuoteMeta(userQuery)).
 		WithArgs(
 			user.ID, user.Username, user.FirstName,
-			user.LastName, user.Email, user.DateOfBirth).
+			user.LastName, user.Email, user.DateOfBirth, user.CreatedAt, user.UpdatedAt, user.IsDeleted).
 		WillReturnResult(
 			sqlmock.NewResult(1, 1))
 
@@ -116,14 +119,15 @@ func (s *UserTestSuite) TestUser_FindByID_ReturnsError() {
 
 func (s *UserTestSuite) TestUser_Update() {
 	//Given
-	const userQuery = `UPDATE "users" SET "username"=$1,"first_name"=$2,"last_name"=$3,"email"=$4,"dob"=$5 WHERE "id" = $6`
+	const userQuery = `UPDATE "users" SET "username"=$1,"first_name"=$2,"last_name"=$3,"email"=$4,"dob"=$5,"updated_at"=$6 WHERE "id" = $7`
 	user := s.SeedUser()
+	user.UpdatedAt = time.Now()
 
 	//When
 	s.Mock.ExpectExec(regexp.QuoteMeta(userQuery)).
 		WithArgs(
 			user.Username, user.FirstName, user.LastName,
-			user.Email, user.DateOfBirth, user.ID).
+			user.Email, user.DateOfBirth, sqlmock.AnyArg(), user.ID).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	err := s.Repo.Update(context.Background(), user)
