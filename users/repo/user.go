@@ -11,6 +11,7 @@ type UserRepository interface {
 	ListAll(ctx context.Context) ([]*model.User, error)
 	FindByID(ctx context.Context, id string) (*model.User, error)
 	Update(ctx context.Context, user *model.User) error
+	Delete(ctx context.Context, user *model.User) error
 }
 
 type UserRepo struct {
@@ -33,7 +34,11 @@ func (r *UserRepo) Create(ctx context.Context, user *model.User) error {
 func (r *UserRepo) ListAll(ctx context.Context) ([]*model.User, error) {
 	var users []*model.User
 
-	if err := r.Db.Debug().WithContext(ctx).Find(&users).Error; err != nil {
+	err := r.Db.Debug().WithContext(ctx).
+		Find(&users).
+		Error
+
+	if err != nil {
 		return nil, err
 	}
 
@@ -54,4 +59,8 @@ func (r *UserRepo) FindByID(ctx context.Context, id string) (*model.User, error)
 
 func (r *UserRepo) Update(ctx context.Context, user *model.User) error {
 	return r.Db.Debug().WithContext(ctx).Model(&user).Updates(&user).Error
+}
+
+func (r *UserRepo) Delete(ctx context.Context, user *model.User) error {
+	return r.Db.Debug().WithContext(ctx).Delete(&user).Error
 }

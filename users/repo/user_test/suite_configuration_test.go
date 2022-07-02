@@ -66,7 +66,6 @@ func (s *UserTestSuite) SeedUser() *model.User {
 	user.LastName = gofakeit.LastName()
 	user.Email = gofakeit.Email()
 	user.DateOfBirth = gofakeit.Date().Format("01/02/2006")
-	user.IsDeleted = false
 
 	return &user
 }

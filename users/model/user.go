@@ -11,6 +11,6 @@ type User struct {
 	DateOfBirth string    `json:"date_of_birth" gorm:"column:dob" db:"dob"`
 	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
-	IsDeleted   bool      `json:"is_deleted"`
+	DeletedAt   time.Time `json:"deleted_at"`
 	Address     []Address `json:"addresses" db:"-"`
 }
