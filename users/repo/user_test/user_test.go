@@ -86,7 +86,7 @@ func (s *UserTestSuite) TestUser_FindByID() {
 	const userQuery = `SELECT * FROM "users" WHERE id = $1`
 	user := s.SeedUser()
 
-	s.createMockUserInDB(user)
+	s.createRandomUserInDB(user)
 
 	//When
 	s.Mock.ExpectQuery(regexp.QuoteMeta(userQuery)).
@@ -146,7 +146,7 @@ func (s *UserTestSuite) TestUser_Update() {
 func (s *UserTestSuite) TestUser_Delete() {
 	//Given
 	user := s.SeedUser()
-	s.createMockUserInDB(user)
+	s.createRandomUserInDB(user)
 	userQuery := `DELETE FROM "users" WHERE "users"."id" = $1`
 
 	//When
@@ -159,7 +159,7 @@ func (s *UserTestSuite) TestUser_Delete() {
 	s.Require().Nil(errExpectations)
 }
 
-func (s *UserTestSuite) createMockUserInDB(user *model.User) {
+func (s *UserTestSuite) createRandomUserInDB(user *model.User) {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 	const userQuery = `INSERT INTO "users" ("id","username","first_name","last_name","email","dob","created_at","updated_at","deleted_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`
